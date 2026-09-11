@@ -17,9 +17,18 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
-        User::factory()->create([
+        User::firstOrCreate(['email' => 'test@example.com'], [
             'name' => 'Test User',
-            'email' => 'test@example.com',
+            'password' => 'password',
+            'role' => 'citizen',
         ]);
+
+        if (env('ADMIN_EMAIL') && env('ADMIN_PASSWORD')) {
+            User::updateOrCreate(['email' => env('ADMIN_EMAIL')], [
+                'name' => env('ADMIN_NAME', 'Administrateur ATLost'),
+                'password' => env('ADMIN_PASSWORD'),
+                'role' => 'admin',
+            ]);
+        }
     }
 }

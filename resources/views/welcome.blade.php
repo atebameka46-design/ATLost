@@ -634,9 +634,18 @@
                     </div>
                 </div>
 
-                <!-- Tab Report Form -->
+                <!-- Tab Report Form : réservé aux utilisateurs connectés -->
                 <div id="tab-report" class="max-w-2xl mx-auto hidden">
-                    <form onsubmit="handleReport(event)" class="bg-white p-5 rounded-2xl border border-n-300/60 shadow-xs space-y-3">
+                    @guest
+                    <div class="bg-white p-6 rounded-2xl border border-n-300/60 shadow-xs text-center">
+                        <h3 class="text-base font-bold text-p-950">Connectez-vous pour signaler un document</h3>
+                        <p class="text-xs text-n-600 mt-2 mb-4">La recherche reste accessible sans compte.</p>
+                        <a href="{{ route('login') }}" class="inline-flex bg-p-950 hover:bg-p-800 text-white font-extrabold px-5 py-2.5 rounded-lg text-xs">Se connecter</a>
+                        <a href="{{ route('register') }}" class="inline-flex ml-2 border border-p-950 text-p-950 font-bold px-5 py-2.5 rounded-lg text-xs">Créer un compte</a>
+                    </div>
+                    @else
+                    <form method="POST" action="{{ route('reports.store') }}" class="bg-white p-5 rounded-2xl border border-n-300/60 shadow-xs space-y-3">
+                        @csrf
                         <div class="text-center mb-3">
                             <h3 class="text-base font-bold text-p-950">Signalement citoyen d'un document trouvé</h3>
                             <p class="text-[11px] text-n-600 mt-0.5">Vos coordonnées restent 100% confidentielles.</p>
@@ -644,11 +653,11 @@
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div>
                                 <label class="block text-[11px] font-bold text-n-700 uppercase mb-1">Nom sur la pièce</label>
-                                <input type="text" required placeholder="Ex: ETO'O Francis" class="w-full bg-n-50 border border-n-300 rounded-lg px-3 py-2 text-xs font-medium outline-none focus:border-p-600">
+                                <input name="owner_name" type="text" required placeholder="Ex: ETO'O Francis" class="w-full bg-n-50 border border-n-300 rounded-lg px-3 py-2 text-xs font-medium outline-none focus:border-p-600">
                             </div>
                             <div>
                                 <label class="block text-[11px] font-bold text-n-700 uppercase mb-1">Type de document</label>
-                                <select required class="w-full bg-n-50 border border-n-300 rounded-lg px-3 py-2 text-xs font-medium outline-none focus:border-p-600">
+                                <select name="document_type" required class="w-full bg-n-50 border border-n-300 rounded-lg px-3 py-2 text-xs font-medium outline-none focus:border-p-600">
                                     <option value="">Sélectionnez</option>
                                     <option value="CNI">Carte Nationale (CNI)</option>
                                     <option value="Permis">Permis de Conduire</option>
@@ -657,17 +666,18 @@
                             </div>
                             <div>
                                 <label class="block text-[11px] font-bold text-n-700 uppercase mb-1">Lieu de la découverte</label>
-                                <input type="text" required placeholder="Ex: Douala - Bonanjo" class="w-full bg-n-50 border border-n-300 rounded-lg px-3 py-2 text-xs font-medium outline-none focus:border-p-600">
+                                <input name="location" type="text" required placeholder="Ex: Douala - Bonanjo" class="w-full bg-n-50 border border-n-300 rounded-lg px-3 py-2 text-xs font-medium outline-none focus:border-p-600">
                             </div>
                             <div>
                                 <label class="block text-[11px] font-bold text-n-700 uppercase mb-1">Votre Téléphone</label>
-                                <input type="tel" required placeholder="Ex: +237 6xx xx xx xx" class="w-full bg-n-50 border border-n-300 rounded-lg px-3 py-2 text-xs font-medium outline-none focus:border-p-600">
+                                <input name="phone" type="tel" required placeholder="Ex: +237 6xx xx xx xx" class="w-full bg-n-50 border border-n-300 rounded-lg px-3 py-2 text-xs font-medium outline-none focus:border-p-600">
                             </div>
                         </div>
                         <button type="submit" class="w-full bg-p-950 hover:bg-p-800 text-white font-extrabold py-2.5 rounded-lg shadow-xs transition-all duration-300 text-xs">
                             Publier le signalement sécurisé →
                         </button>
                     </form>
+                    @endguest
                 </div>
 
             </div>
@@ -1091,7 +1101,7 @@
         }
 
         function claimDoc(docName) {
-            showToast('Demande envoyée pour: ' + docName + '. Notre équipe vous contactera sous 30 minutes.');
+            window.location.href = @json(route('login'));
         }
 
         function handleAlert(e) {

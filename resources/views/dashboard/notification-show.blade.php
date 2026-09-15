@@ -1,0 +1,4 @@
+@extends('layouts.dashboard', ['title' => 'Détail de la notification', 'heading' => 'Détail de la notification'])
+@section('dashboard-content')
+<div class="dashboard-page-content section-page"><a href="{{ route('notifications') }}" class="report-back-link">← Retour aux notifications</a><section class="dashboard-card notification-detail-card"><span class="notification-detail-icon"><i class="fa-solid fa-bell"></i></span><p class="dashboard-eyebrow">Notification · {{ $userNotification->created_at->format('d/m/Y à H:i') }}</p><h1>{{ $userNotification->title }}</h1><p class="notification-detail-message">{{ $userNotification->message }}</p><a href="{{ $userNotification->action_url ?: route('notifications') }}" class="dashboard-green-button">Ouvrir l’interface concernée <span>→</span></a></section></div>
+@endsection

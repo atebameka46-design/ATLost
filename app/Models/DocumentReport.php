@@ -8,7 +8,12 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class DocumentReport extends Model
 {
-    protected $fillable = ['user_id', 'document_type', 'owner_name', 'location', 'phone', 'description', 'photo_path', 'status'];
+    protected $fillable = ['user_id', 'document_type', 'owner_name', 'location', 'phone', 'reward_amount', 'description', 'photo_path', 'status'];
+
+    protected function casts(): array
+    {
+        return ['reward_amount' => 'decimal:2'];
+    }
 
     public function user(): BelongsTo
     {

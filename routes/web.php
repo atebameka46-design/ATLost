@@ -4,9 +4,11 @@ use App\Http\Controllers\AiChatController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DocumentReportController;
 use App\Http\Controllers\DocumentSearchController;
+use App\Models\DocumentReport;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Schema;
 
 Route::get('/marketplace', [DocumentSearchController::class, 'marketplace'])->name('marketplace');
 Route::get('/documents/{documentReport}', [DocumentReportController::class, 'show'])->name('reports.show');
@@ -25,7 +27,18 @@ Route::get('/', function () {
         return redirect()->route($user->isAdmin() ? 'admin.dashboard' : 'citizen.dashboard');
     }
 
-    return view('welcome');
+    $recentDocuments = collect();
+
+    if (Schema::hasTable('document_reports')) {
+        $recentDocuments = DocumentReport::query()
+            ->whereIn('status', ['pending', 'approved'])
+            ->whereDoesntHave('claims', fn ($query) => $query->where('status', 'completed'))
+            ->latest()
+            ->limit(6)
+            ->get();
+    }
+
+    return view('welcome', compact('recentDocuments'));
 });
 Route::get('/language/{locale}', function (string $locale) {
     abort_unless(in_array($locale, ['fr', 'en'], true), 404);
@@ -88,6 +101,11 @@ Route::middleware('auth')->group(function (): void {
     Route::post('/claims/{documentClaim}/accept', [DocumentReportController::class, 'acceptClaim'])->name('claims.accept');
     Route::patch('/claims/{documentClaim}/appointment', [DocumentReportController::class, 'appointment'])->name('claims.appointment');
     Route::post('/claims/{documentClaim}/pay', [DocumentReportController::class, 'pay'])->name('claims.pay');
+    Route::post('/claims/{documentClaim}/complete', [DocumentReportController::class, 'completeClaim'])->name('claims.complete');
+    Route::post('/claims/{documentClaim}/withdraw', [DocumentReportController::class, 'withdrawPayout'])->name('claims.withdraw');
+    Route::get('/admin/payments', [DocumentReportController::class, 'adminPayments'])->middleware('role:admin')->name('admin.payments');
+    Route::patch('/admin/payments/{documentClaim}/verify', [DocumentReportController::class, 'verifyPayment'])->middleware('role:admin')->name('admin.payments.verify');
+    Route::patch('/admin/payments/{documentClaim}/reject', [DocumentReportController::class, 'rejectPayment'])->middleware('role:admin')->name('admin.payments.reject');
     Route::delete('/claims/{documentClaim}', [DocumentReportController::class, 'cancelClaim'])->name('claims.cancel');
     Route::get('/citizen/documents/{documentReport}/edit', [DocumentReportController::class, 'edit'])->middleware('role:citizen')->name('reports.edit');
     Route::put('/citizen/documents/{documentReport}', [DocumentReportController::class, 'updateDetails'])->middleware('role:citizen')->name('reports.update-details');
@@ -134,4 +152,11 @@ Route::middleware('auth')->group(function (): void {
             'activityTimeline' => $activity,
         ]);
     })->middleware('role:citizen')->name('citizen.activity');
+
+    Route::get('/messages', 'App\Http\Controllers\MessagingController@index')->name('messages');
+    Route::get('/messages/{conversation}', 'App\Http\Controllers\MessagingController@show')->name('messages.show');
+    Route::post('/messages/{conversation}', 'App\Http\Controllers\MessagingController@send')->name('messages.send');
+    Route::get('/messages/search', 'App\Http\Controllers\MessagingController@search')->name('messages.search');
+    Route::post('/messages/start', 'App\Http\Controllers\MessagingController@start')->name('messages.start');
+    Route::get('/messages/{conversation}/poll', 'App\Http\Controllers\MessagingController@poll')->name('messages.poll');
 });

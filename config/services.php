@@ -1,6 +1,11 @@
 <?php
 
 return [
+    'atlost' => [
+        'service_fee_percentage' => (float) env('ATLOST_SERVICE_FEE_PERCENTAGE', 10),
+        'mobile_money_number' => env('ATLOST_MOBILE_MONEY_NUMBER', '658581255'),
+    ],
+
     'gemini' => [
         'key' => env('GEMINI_API_KEY'),
         'model' => env('GEMINI_MODEL', 'gemini-3.8-flash'),

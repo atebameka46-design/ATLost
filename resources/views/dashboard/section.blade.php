@@ -123,6 +123,7 @@
                     <label>{{ __('messages.document_type') }}<select name="document_type" required><option value="">{{ __('messages.select_one') }}</option><option value="CNI">Carte Nationale (CNI)</option><option value="Permis">Permis de conduire</option><option value="Passeport">Passeport</option></select></label>
                     <label>{{ __('messages.discovery_location') }}<input name="location" value="{{ old('location') }}" required placeholder="{{ __('messages.location_example') }}"></label>
                     <label>{{ __('messages.phone') }}<input name="phone" value="{{ old('phone') }}" required placeholder="+237 6xx xx xx xx"></label>
+                    <label>Montant demandé pour la restitution (FCFA)<input name="reward_amount" type="number" min="0" step="0.01" value="{{ old('reward_amount', 0) }}"></label>
                     <label>{{ __('messages.document_photo') }}<input type="file" name="photo" accept="image/*" required></label>
                     <button class="dashboard-green-button" type="submit">{{ __('messages.publish_report') }}</button>
                 </form>
@@ -140,6 +141,7 @@
                         <label>{{ __('messages.document_type') }}<select name="document_type" required><option value="CNI" @selected($report->document_type === 'CNI')>Carte Nationale</option><option value="Permis" @selected($report->document_type === 'Permis')>Permis</option><option value="Passeport" @selected($report->document_type === 'Passeport')>Passeport</option></select></label>
                         <label>{{ __('messages.discovery_location') }}<input name="location" value="{{ old('location', $report->location) }}" required></label>
                         <label>{{ __('messages.phone') }}<input name="phone" value="{{ old('phone', $report->phone) }}" required></label>
+                        <label>Montant demandé pour la restitution (FCFA)<input name="reward_amount" type="number" min="0" step="0.01" value="{{ old('reward_amount', $report->reward_amount) }}"></label>
                         <label>{{ __('messages.document_photo') }}<input type="file" name="photo" accept="image/*"></label>
                         <button class="dashboard-green-button icon-action-button" type="submit" title="{{ __('messages.save_changes') }}" aria-label="{{ __('messages.save_changes') }}"><i class="fa-solid fa-floppy-disk" aria-hidden="true"></i></button>
                     </form>

@@ -591,45 +591,37 @@
                     <div id="search-results" class="pt-2 space-y-3">
                         <div class="flex items-center justify-between text-[11px] font-bold text-n-600 uppercase tracking-wider px-1">
                             <span>Documents récemment enregistrés</span>
-                            <span id="results-count">3 résultats récents</span>
+                            <div class="flex items-center gap-3">
+                                <span id="results-count">{{ $recentDocuments->count() }} résultats récents</span>
+                                @auth
+                                    <a href="{{ auth()->user()->isAdmin() ? route('marketplace') : route('citizen.search') }}" class="text-accent-dark hover:text-p-950 transition-colors">Voir tout →</a>
+                                @else
+                                    <a href="{{ route('marketplace') }}" class="text-accent-dark hover:text-p-950 transition-colors">Voir tout →</a>
+                                @endauth
+                            </div>
                         </div>
 
                         <div id="cards-container" class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                            <div class="doc-card bg-white p-4 rounded-xl border border-n-200/80 hover:border-p-300 transition-all duration-300 shadow-xs" data-type="CNI" data-name="kamga">
-                                <div class="flex justify-between items-start mb-2">
-                                    <span class="bg-p-50 text-p-800 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full border border-p-200">CNI</span>
-                                    <span class="text-[10px] font-bold text-success flex items-center gap-1">● Disponible</span>
+                            @forelse ($recentDocuments as $document)
+                                <div class="doc-card bg-white p-4 rounded-xl border border-n-200/80 hover:border-p-300 transition-all duration-300 shadow-xs" data-type="{{ $document->document_type }}" data-name="{{ strtolower($document->owner_name) }}">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <span class="bg-p-50 text-p-800 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full border border-p-200">{{ $document->document_type }}</span>
+                                        <span class="text-[10px] font-bold text-success flex items-center gap-1">● Disponible</span>
+                                    </div>
+                                    <h3 class="font-bold text-p-950 text-sm mb-0.5">{{ $document->owner_name }}</h3>
+                                    <p class="text-[11px] text-n-500 mb-2.5">Lieu: <span class="font-semibold text-n-800">{{ $document->location }}</span></p>
+                                    @auth
+                                        <a href="{{ route('reports.show', $document) }}" class="block w-full bg-p-950 hover:bg-p-800 text-white text-center font-bold py-2 rounded-lg text-xs transition-colors shadow-xs">Voir le document</a>
+                                    @else
+                                        <a href="{{ route('marketplace', ['q' => $document->owner_name]) }}" class="block w-full bg-p-950 hover:bg-p-800 text-white text-center font-bold py-2 rounded-lg text-xs transition-colors shadow-xs">Voir le document</a>
+                                    @endauth
                                 </div>
-                                <h3 class="font-bold text-p-950 text-sm mb-0.5">KAMGA T. Jean-Paul</h3>
-                                <p class="text-[11px] text-n-500 mb-2.5">Lieu: <span class="font-semibold text-n-800">Yaoundé (Bastos)</span></p>
-                                <button onclick="claimDoc('CNI - KAMGA T. Jean-Paul')" class="w-full bg-p-950 hover:bg-p-800 text-white font-bold py-2 rounded-lg text-xs transition-colors shadow-xs">
-                                    Réclamer ce document
-                                </button>
-                            </div>
-
-                            <div class="doc-card bg-white p-4 rounded-xl border border-n-200/80 hover:border-p-300 transition-all duration-300 shadow-xs" data-type="Permis" data-name="mbida">
-                                <div class="flex justify-between items-start mb-2">
-                                    <span class="bg-accent-light text-accent-dark text-[10px] font-extrabold px-2.5 py-0.5 rounded-full">Permis</span>
-                                    <span class="text-[10px] font-bold text-success flex items-center gap-1">● Disponible</span>
+                            @empty
+                                <div class="md:col-span-3 bg-white p-6 rounded-xl border border-n-200 text-center">
+                                    <p class="text-sm font-bold text-p-950">Aucun document récent disponible.</p>
+                                    <p class="text-xs text-n-600 mt-1">Utilisez la recherche complète pour consulter la base.</p>
                                 </div>
-                                <h3 class="font-bold text-p-950 text-sm mb-0.5">MBIDA A. Carine</h3>
-                                <p class="text-[11px] text-n-500 mb-2.5">Lieu: <span class="font-semibold text-n-800">Douala (Akwa)</span></p>
-                                <button onclick="claimDoc('Permis - MBIDA A. Carine')" class="w-full bg-p-950 hover:bg-p-800 text-white font-bold py-2 rounded-lg text-xs transition-colors shadow-xs">
-                                    Réclamer ce document
-                                </button>
-                            </div>
-
-                            <div class="doc-card bg-white p-4 rounded-xl border border-n-200/80 hover:border-p-300 transition-all duration-300 shadow-xs" data-type="Passeport" data-name="ngo">
-                                <div class="flex justify-between items-start mb-2">
-                                    <span class="bg-p-100 text-p-900 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full">Passeport</span>
-                                    <span class="text-[10px] font-bold text-success flex items-center gap-1">● Disponible</span>
-                                </div>
-                                <h3 class="font-bold text-p-950 text-sm mb-0.5">NGO B. Samuel</h3>
-                                <p class="text-[11px] text-n-500 mb-2.5">Lieu: <span class="font-semibold text-n-800">Bafoussam (Centre)</span></p>
-                                <button onclick="claimDoc('Passeport - NGO B. Samuel')" class="w-full bg-p-950 hover:bg-p-800 text-white font-bold py-2 rounded-lg text-xs transition-colors shadow-xs">
-                                    Réclamer ce document
-                                </button>
-                            </div>
+                            @endforelse
                         </div>
                     </div>
                 </div>

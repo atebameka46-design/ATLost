@@ -236,4 +236,13 @@ return [
     'update_profile' => 'Update profile',
     'edit_report' => 'Edit report',
     'edit' => 'Edit',
+    'messages' => 'Messages',
+    'new_message' => 'New message',
+    'search_people' => 'Search a person',
+    'type_message' => 'Write your message...',
+    'send' => 'Send',
+    'no_conversation' => 'Select a conversation to start.',
+    'no_messages' => 'No messages yet. Send the first one.',
+    'contact_about_document' => 'Contact about document',
+    'about_document' => 'Document:',
 ];

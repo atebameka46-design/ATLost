@@ -18,53 +18,69 @@
             <p class="dash-label">{{ __('messages.menu') }}</p>
             <nav class="dash-nav" aria-label="Navigation principale">
                 <a class="{{ request()->routeIs('dashboard', 'citizen.dashboard', 'admin.dashboard') ? 'active' : '' }}" href="{{ route('dashboard') }}"><i class="fa-solid fa-gauge-high" aria-hidden="true"></i>{{ __('messages.dashboard') }}</a>
-                @if (auth()->user()->isAdmin())
-                    <a class="{{ request()->routeIs('admin.reports') ? 'active' : '' }}" href="{{ route('admin.reports') }}"><i class="fa-solid fa-flag" aria-hidden="true"></i>{{ __('messages.reports') }} <b>12+</b></a>
-                    <a class="{{ request()->routeIs('admin.analytics') ? 'active' : '' }}" href="{{ route('admin.analytics') }}"><i class="fa-solid fa-chart-column" aria-hidden="true"></i>Analytics</a>
-                    <a class="{{ request()->routeIs('admin.team') ? 'active' : '' }}" href="{{ route('admin.team') }}"><i class="fa-solid fa-users" aria-hidden="true"></i>{{ __('messages.team') ?? 'Team' }}</a>
-                @else
-                    <a class="{{ request()->routeIs('citizen.documents') ? 'active' : '' }}" href="{{ route('citizen.documents') }}"><i class="fa-solid fa-folder-open" aria-hidden="true"></i>{{ __('messages.documents') }}</a>
-                    <a class="{{ request()->routeIs('citizen.search') ? 'active' : '' }}" href="{{ route('citizen.search') }}"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>{{ __('messages.search') }}</a>
-                    <a class="{{ request()->routeIs('citizen.activity') ? 'active' : '' }}" href="{{ route('citizen.activity') }}"><i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i>{{ __('messages.activity') }}</a>
-                @endif
+                @auth
+                    <a class="{{ request()->routeIs('messages') ? 'active' : '' }}" href="{{ route('messages') }}"><i class="fa-solid fa-envelope" aria-hidden="true"></i>{{ __('messages.messages') }}</a>
+                    @if (auth()->user()->isAdmin())
+                        <a class="{{ request()->routeIs('admin.reports') ? 'active' : '' }}" href="{{ route('admin.reports') }}"><i class="fa-solid fa-flag" aria-hidden="true"></i>{{ __('messages.reports') }} <b>12+</b></a>
+                        <a class="{{ request()->routeIs('admin.payments') ? 'active' : '' }}" href="{{ route('admin.payments') }}"><i class="fa-solid fa-money-check-dollar" aria-hidden="true"></i>Paiements</a>
+                        <a class="{{ request()->routeIs('admin.analytics') ? 'active' : '' }}" href="{{ route('admin.analytics') }}"><i class="fa-solid fa-chart-column" aria-hidden="true"></i>Analytics</a>
+                        <a class="{{ request()->routeIs('admin.team') ? 'active' : '' }}" href="{{ route('admin.team') }}"><i class="fa-solid fa-users" aria-hidden="true"></i>{{ __('messages.team') ?? 'Team' }}</a>
+                    @else
+                        <a class="{{ request()->routeIs('citizen.documents') ? 'active' : '' }}" href="{{ route('citizen.documents') }}"><i class="fa-solid fa-folder-open" aria-hidden="true"></i>{{ __('messages.documents') }}</a>
+                        <a class="{{ request()->routeIs('citizen.search') ? 'active' : '' }}" href="{{ route('citizen.search') }}"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>{{ __('messages.search') }}</a>
+                        <a class="{{ request()->routeIs('citizen.activity') ? 'active' : '' }}" href="{{ route('citizen.activity') }}"><i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i>{{ __('messages.activity') }}</a>
+                    @endif
+                @endauth
             </nav>
 
             <p class="dash-label general">{{ __('messages.general') }}</p>
             <nav class="dash-nav" aria-label="Navigation secondaire">
-                <a class="{{ request()->routeIs('profile') ? 'active' : '' }}" href="{{ route('profile') }}"><i class="fa-solid fa-user" aria-hidden="true"></i>{{ __('messages.profile') }}</a>
+                @auth
+                    <a class="{{ request()->routeIs('profile') ? 'active' : '' }}" href="{{ route('profile') }}"><i class="fa-solid fa-user" aria-hidden="true"></i>{{ __('messages.profile') }}</a>
+                @else
+                    <a href="{{ route('login') }}"><i class="fa-solid fa-right-to-bracket" aria-hidden="true"></i>Connexion</a>
+                @endauth
             </nav>
 
             <div class="dash-download">
-                <small><i class="fa-solid fa-circle" aria-hidden="true"></i></small>
-                <strong>{{ __('messages.download_app_title', ['default' => 'Download our\nMobile App']) }}</strong>
-                <em>{{ __('messages.download_app_subtitle', ['default' => 'Get tasks done on the go']) }}</em>
-                <a href="#"><i class="fa-solid fa-download"></i> {{ __('messages.download', ['default' => 'Download']) }}</a>
+                <small><i class="fa-solid fa-bullhorn" aria-hidden="true"></i> PUBLICITÉ</small>
+                <strong>Besoin d’aide pour retrouver votre document ?</strong>
+                <em>L’assistant ATLost vous guide à chaque étape.</em>
+                <a href="{{ route('assistant') }}"><i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i> Ouvrir l’assistant</a>
             </div>
         </aside>
 
         <main class="dash-main">
             <header class="dash-top">
+                <button type="button" class="dash-back-button" aria-label="Retour" onclick="goBackToPreviousPage()">
+                    <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+                    <span>Retour</span>
+                </button>
                 <div class="dash-search" role="search">
                     <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
                     <span>{{ __('messages.search_task', ['default' => 'Search task']) }}</span>
                     <kbd>⌘ F</kbd>
                 </div>
                 <div class="dash-tools">
-                    <a href="{{ route('assistant') }}" class="dash-tool-link" aria-label="{{ __('messages.assistant') }}"><i class="fa-solid fa-sparkles"></i></a>
+                    <a href="{{ route('assistant') }}" class="dash-tool-link" aria-label="{{ __('messages.assistant') }}"><i class="fa-solid fa-wand-magic-sparkles"></i></a>
                     <button type="button" aria-label="{{ __('messages.messages', ['default' => 'Messages']) }}"><i class="fa-solid fa-envelope"></i></button>
-                    <a href="{{ route('notifications') }}" class="dash-tool-link" aria-label="{{ __('messages.notifications') }}"><i class="fa-solid fa-bell"></i>@if(auth()->user()->notifications()->whereNull('read_at')->count())<b class="notification-count">{{ auth()->user()->notifications()->whereNull('read_at')->count() }}</b>@endif</a>
-                    <details class="language-switcher"><summary aria-label="{{ __('messages.language') }}"><i class="fa-solid fa-globe"></i></summary><div class="language-menu"><a href="{{ route('language.switch', 'fr') }}">{{ __('messages.french') }}</a><a href="{{ route('language.switch', 'en') }}">{{ __('messages.english') }}</a></div></details>
-                    <div class="dash-user">
-                        @if (auth()->user()->avatar_url)
-                            <img src="{{ auth()->user()->avatar_url }}" alt="Photo de profil de {{ auth()->user()->name }}">
-                        @else
-                            <span>{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</span>
-                        @endif
-                        <div>
-                            <strong>{{ auth()->user()->name }}</strong>
-                            <small>{{ auth()->user()->email }}</small>
+                    @auth
+                        <a href="{{ route('notifications') }}" class="dash-tool-link" aria-label="{{ __('messages.notifications') }}"><i class="fa-solid fa-bell"></i>@if(auth()->user()->notifications()->whereNull('read_at')->count())<b class="notification-count">{{ auth()->user()->notifications()->whereNull('read_at')->count() }}</b>@endif</a>
+                        <details class="language-switcher"><summary aria-label="{{ __('messages.language') }}"><i class="fa-solid fa-globe"></i></summary><div class="language-menu"><a href="{{ route('language.switch', 'fr') }}">{{ __('messages.french') }}</a><a href="{{ route('language.switch', 'en') }}">{{ __('messages.english') }}</a></div></details>
+                        <div class="dash-user">
+                            @if (auth()->user()->avatar_url)
+                                <img src="{{ auth()->user()->avatar_url }}" alt="Photo de profil de {{ auth()->user()->name }}">
+                            @else
+                                <span>{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</span>
+                            @endif
+                            <div>
+                                <strong>{{ auth()->user()->name }}</strong>
+                                <small>{{ auth()->user()->email }}</small>
+                            </div>
                         </div>
-                    </div>
+                    @else
+                        <a href="{{ route('login') }}" class="dash-user login-cta">Se connecter</a>
+                    @endauth
                 </div>
             </header>
 
@@ -74,6 +90,15 @@
         </main>
     </div>
     <script>
+        function goBackToPreviousPage() {
+            if (window.history.length > 1) {
+                window.history.back();
+                return;
+            }
+
+            window.location.href = @js(route('dashboard'));
+        }
+
         const savedTheme = localStorage.getItem('atlost-theme');
         if (savedTheme) document.body.classList.add(`theme-${savedTheme}`);
         // Les actions recherche/signalement restent toujours dans l'espace connecté.

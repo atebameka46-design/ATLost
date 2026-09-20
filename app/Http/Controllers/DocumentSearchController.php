@@ -11,6 +11,21 @@ use Illuminate\View\View;
 
 class DocumentSearchController extends Controller
 {
+    private function documentTypeRules(): array
+    {
+        return [
+            'document_type' => ['nullable', 'in:CNI,Permis,Passeport,Other'],
+            'document_type_other' => ['required_if:document_type,Other', 'nullable', 'string', 'max:40'],
+        ];
+    }
+
+    private function resolveDocumentType(array $data): ?string
+    {
+        return ($data['document_type'] ?? null) === 'Other'
+            ? trim((string) $data['document_type_other'])
+            : ($data['document_type'] ?? null);
+    }
+
     public function marketplace(Request $request): View
     {
         $query = trim((string) $request->query('q', ''));
@@ -41,7 +56,9 @@ class DocumentSearchController extends Controller
 
     public function store(Request $request): View
     {
-        $data = $request->validate(['query' => ['required', 'string', 'max:120'], 'document_type' => ['nullable', 'in:CNI,Permis,Passeport'], 'status' => ['nullable', 'in:approved,resolved'], 'location' => ['nullable', 'string', 'max:160']]);
+        $data = $request->validate(['query' => ['required', 'string', 'max:120'], ...$this->documentTypeRules(), 'status' => ['nullable', 'in:approved,resolved'], 'location' => ['nullable', 'string', 'max:160']]);
+        $data['document_type'] = $this->resolveDocumentType($data);
+        unset($data['document_type_other']);
         $search = $request->user()->documentSearches()->create($data);
         $needle = mb_strtolower(trim($data['query']));
         $results = DocumentReport::query()
@@ -71,7 +88,9 @@ class DocumentSearchController extends Controller
 
     public function alert(Request $request): RedirectResponse
     {
-        $data = $request->validate(['query' => ['required', 'string', 'max:120'], 'document_type' => ['nullable', 'in:CNI,Permis,Passeport']]);
+        $data = $request->validate(['query' => ['required', 'string', 'max:120'], ...$this->documentTypeRules()]);
+        $data['document_type'] = $this->resolveDocumentType($data);
+        unset($data['document_type_other']);
         DocumentAlert::firstOrCreate(['user_id' => $request->user()->id, 'query' => $data['query'], 'document_type' => $data['document_type'] ?? null]);
 
         return back()->with('status', 'Vous serez prévenu dès qu’un document correspondant sera disponible.');
@@ -83,10 +102,12 @@ class DocumentSearchController extends Controller
 
         $data = $request->validate([
             'query' => ['required', 'string', 'max:120'],
-            'document_type' => ['nullable', 'in:CNI,Permis,Passeport'],
+            ...$this->documentTypeRules(),
             'status' => ['nullable', 'in:approved,resolved'],
             'location' => ['nullable', 'string', 'max:160'],
         ]);
+        $data['document_type'] = $this->resolveDocumentType($data);
+        unset($data['document_type_other']);
 
         $documentSearch->update($data);
 

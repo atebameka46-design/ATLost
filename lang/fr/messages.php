@@ -234,4 +234,13 @@ return [
     'update_profile' => 'Mettre à jour le profil',
     'edit_report' => 'Modifier le signalement',
     'edit' => 'Modifier',
+    'messages' => 'Messages',
+    'new_message' => 'Nouveau message',
+    'search_people' => 'Rechercher une personne',
+    'type_message' => 'Écrivez votre message...',
+    'send' => 'Envoyer',
+    'no_conversation' => 'Sélectionnez une conversation pour commencer.',
+    'no_messages' => 'Aucun message. Envoyez le premier.',
+    'contact_about_document' => 'Contacter au sujet du document',
+    'about_document' => 'Document :',
 ];
